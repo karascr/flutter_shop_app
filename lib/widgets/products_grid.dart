@@ -6,7 +6,8 @@ import '../providers/products_provider.dart';
 import 'product_item.dart';
 
 class ProductsGrid extends StatelessWidget {
-  const ProductsGrid({Key key, this.showOnlyFavorites}) : super(key: key);
+  const ProductsGrid({Key? key, required this.showOnlyFavorites})
+      : super(key: key);
   final bool showOnlyFavorites;
 
   @override

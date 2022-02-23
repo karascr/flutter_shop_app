@@ -8,14 +8,14 @@ class Product with ChangeNotifier {
   final String description;
   final String imageUrl;
   final double price;
-  bool isFavorite;
+  late bool isFavorite;
 
   Product({
-    this.id,
-    this.title,
-    this.description,
-    this.imageUrl,
-    this.price,
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.imageUrl,
+    required this.price,
     this.isFavorite = false,
   });
 

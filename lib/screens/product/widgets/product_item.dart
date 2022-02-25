@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '/providers/cart.dart';
-import '/screens/product_detail_screen.dart';
+import '../product_detail_screen.dart';
 import '/providers/product.dart';
 
 class ProductItem extends StatelessWidget {
@@ -38,8 +38,21 @@ class ProductItem extends StatelessWidget {
               Icons.shopping_cart,
               color: Theme.of(context).colorScheme.secondary,
             ),
-            onPressed: () =>
-                cart.addItem(product.id, product.price, product.title),
+            onPressed: () {
+              cart.addItem(product.id, product.price, product.title);
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(
+                  "${product.title} added to cart!",
+                  textAlign: TextAlign.center,
+                ),
+                duration: Duration(milliseconds: 2500),
+                action: SnackBarAction(
+                  label: "Undo",
+                  onPressed: () => cart.removeSingleItem(product.id),
+                ),
+              ));
+            },
           ),
         ),
       ),

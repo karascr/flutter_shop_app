@@ -1,16 +1,35 @@
-# flutter_shop_app
+# Flutter Shop App with Provider Package
 
-A new Flutter project.
+This is a simple shopping app made wihh Flutter and project of the sections named  "State Management" and "Working with User Input & Forms" of [Flutter & Dart - The Complete Guide [2022 Edition]
+](https://www.udemy.com/share/101rfI3@LjmdUgeGxD3ZEGfuoBjiFKplonutKMn_nWbRYiYznu7mKTpKir6xpa5aGNlQiyOI/) course.
 
-## Getting Started
+## Packages Used
+- provider for state management
+- intl for date formatting
 
-This project is a starting point for a Flutter application.
+## Main Features
+- Fetching data with Provider
+- Listing data
+- Filtering data
+- Managing data (editin and removing)
+- Alert dialogs
+- Forms and Validators
+- 
 
-A few resources to get you started if this is your first Flutter project:
+## To-Dos
+- UI improvement
+- Storing data in a database
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+## Preview
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+##### Main Screen, Add to Favorites and Cart, Place Order
+<img src="/preview/fav_cart.gif"  width="324" height="684" />
+
+##### List Orders
+<img src="/preview/orders.gif"  width="324" height="684" />
+
+##### Edit and Delete Products
+<img src="/preview/edit_delete.gif"  width="324" height="684" />
+
+##### Add New Product
+<img src="/preview/add.gif"  width="324" height="684" />

@@ -28,8 +28,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
   @override
   void didChangeDependencies() {
     if (isInit) {
-      final String productId =
-          ModalRoute.of(context)!.settings.arguments as String;
+      final argument = ModalRoute.of(context)!.settings.arguments;
+      final String productId = argument == null ? "" : argument as String;
       if (productId.isNotEmpty) {
         product = Provider.of<ProductsProvider>(context, listen: false)
             .getById(productId);
@@ -57,7 +57,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
   }
 
   void _saveForm() {
-    _formKey.currentState?.validate();
+    bool? isValid = _formKey.currentState?.validate();
+    if (!isValid!) return;
     _formKey.currentState?.save();
     // print(product);
     final provider = Provider.of<ProductsProvider>(context, listen: false);
@@ -95,6 +96,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   },
                   validator: (value) {
                     if (value!.isEmpty) return "Please provide a value.";
+                    return null;
                   },
                   onSaved: (value) {
                     product = Product(
@@ -122,6 +124,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                       return "Please enter a valid number";
                     if (double.parse(value) <= 0)
                       return "Please enter a number greater then zero.";
+                    return null;
                   },
                   onSaved: (value) {
                     product = Product(
@@ -144,6 +147,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     if (value!.isEmpty) return "Please enter a description.";
                     if (value.length < 10)
                       return "Should be at least 10 characters long";
+                    return null;
                   },
                   onSaved: (value) {
                     product = Product(
@@ -188,6 +192,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         if (!value.startsWith("http") &&
                             !value.startsWith("https"))
                           return "Please enter a valid URL";
+                        return null;
                       },
                       onSaved: (value) {
                         product = Product(

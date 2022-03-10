@@ -5,7 +5,7 @@ import 'package:flutter_shop_app/widgets/app_drawer.dart';
 import 'package:flutter_shop_app/screens/product/widgets/badge.dart';
 import 'package:provider/provider.dart';
 
-import '../../providers/cart.dart';
+import '../../providers/cart_provider.dart';
 import 'widgets/products_grid.dart';
 
 enum FilterOptions {
@@ -67,7 +67,7 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
                     child: Text("Show All"), value: FilterOptions.All),
               ],
             ),
-            Consumer<Cart>(
+            Consumer<CartProvider>(
               builder: (_, cart, child) => Badge(
                 child: child ?? Container(),
                 value: cart.totalItemQuantity.toString(),

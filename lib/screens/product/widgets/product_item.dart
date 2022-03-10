@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '/providers/cart.dart';
+import '../../../providers/cart_provider.dart';
 import '../product_detail_screen.dart';
 import '../../../providers/product.dart';
 
@@ -9,7 +9,8 @@ class ProductItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Product product = Provider.of<Product>(context);
-    final Cart cart = Provider.of<Cart>(context, listen: false);
+    final CartProvider cartProvider =
+        Provider.of<CartProvider>(context, listen: false);
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: GridTile(
@@ -39,7 +40,7 @@ class ProductItem extends StatelessWidget {
               color: Theme.of(context).colorScheme.secondary,
             ),
             onPressed: () {
-              cart.addItem(product.id, product.price, product.title);
+              cartProvider.addItem(product.id, product.price, product.title);
               ScaffoldMessenger.of(context).hideCurrentSnackBar();
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(
@@ -49,7 +50,7 @@ class ProductItem extends StatelessWidget {
                 duration: Duration(milliseconds: 2500),
                 action: SnackBarAction(
                   label: "Undo",
-                  onPressed: () => cart.removeSingleItem(product.id),
+                  onPressed: () => cartProvider.removeSingleItem(product.id),
                 ),
               ));
             },

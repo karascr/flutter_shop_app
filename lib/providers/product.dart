@@ -1,13 +1,16 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
+
+import '../core/constants.dart';
 
 class Product with ChangeNotifier {
-  final String id;
-  final String title;
-  final String description;
-  final String imageUrl;
-  final double price;
+  String id;
+  String title;
+  String description;
+  String imageUrl;
+  double price;
   late bool isFavorite;
 
   Product({
@@ -46,9 +49,15 @@ class Product with ChangeNotifier {
   factory Product.fromJson(String source) =>
       Product.fromMap(json.decode(source));
 
-  void toggleFavoriteStatus() {
-    isFavorite = !isFavorite;
-    notifyListeners();
+  Future<void> toggleFavoriteStatus() async {
+    final url =
+        Uri.https(Constants.dbUrl, Constants.dbProductsKey + "/$id" + ".json");
+    final response =
+        await http.patch(url, body: json.encode({"isFavorite": !isFavorite}));
+    if (response.statusCode == 200) {
+      isFavorite = !isFavorite;
+      notifyListeners();
+    }
   }
 
   @override

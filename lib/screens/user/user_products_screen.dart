@@ -37,21 +37,28 @@ class Body extends StatelessWidget {
 
   final ProductsProvider productsData;
 
+  Future<void> _refreshProducts(BuildContext context) async {
+    Provider.of<ProductsProvider>(context, listen: false).fetchAndSetProducts();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(8),
-      child: ListView.builder(
-        itemCount: productsData.items.length,
-        itemBuilder: (_, i) => Column(
-          children: [
-            UserProductItem(
-              productsData.items[i].id,
-              productsData.items[i].title,
-              productsData.items[i].imageUrl,
-            ),
-            Divider(),
-          ],
+    return RefreshIndicator(
+      onRefresh: () => _refreshProducts(context),
+      child: Padding(
+        padding: EdgeInsets.all(8),
+        child: ListView.builder(
+          itemCount: productsData.items.length,
+          itemBuilder: (_, i) => Column(
+            children: [
+              UserProductItem(
+                productsData.items[i].id,
+                productsData.items[i].title,
+                productsData.items[i].imageUrl,
+              ),
+              Divider(),
+            ],
+          ),
         ),
       ),
     );

@@ -49,11 +49,14 @@ class Product with ChangeNotifier {
   factory Product.fromJson(String source) =>
       Product.fromMap(json.decode(source));
 
-  Future<void> toggleFavoriteStatus() async {
-    final url =
-        Uri.https(Constants.dbUrl, Constants.dbProductsKey + "/$id" + ".json");
-    final response =
-        await http.patch(url, body: json.encode({"isFavorite": !isFavorite}));
+  Future<void> toggleFavoriteStatus(String token, String userID) async {
+    if (userID.isEmpty) return;
+    final url = Uri.https(
+        DbConstants.dbUrl,
+        DbConstants.dbUserFavoritesKey + "/$userID/$id" + ".json",
+        {"auth": token});
+    final response = await http.put(url, body: json.encode(!isFavorite));
+    print(response.body);
     if (response.statusCode == 200) {
       isFavorite = !isFavorite;
       notifyListeners();

@@ -44,16 +44,34 @@ class OrderItem {
 }
 
 class OrderProvider with ChangeNotifier {
+  final String authToken;
+  final String userID;
   List<OrderItem> _orders = [];
+
+  OrderProvider(
+    this.authToken,
+    this.userID,
+    orders,
+  ) {
+    _orders = [...orders];
+  }
 
   List<OrderItem> get orders {
     return [..._orders];
   }
 
-  Future<void> fetchAndSetProducts() async {
-    final url = Uri.https(Constants.dbUrl, Constants.dbOrdersKey + ".json");
+  Future<void> fetchAndSetOrders() async {
+    final url = Uri.https(
+      DbConstants.dbUrl,
+      DbConstants.dbOrdersKey + "/$userID" + ".json",
+      {"auth": authToken},
+    );
     try {
       final response = await http.get(url);
+      if (response.body == "null") {
+        _orders.clear();
+        return;
+      }
       final data = json.decode(response.body) as Map<String, dynamic>;
       final List<OrderItem> loadedItems = [];
       data.forEach((id, data) {
@@ -61,7 +79,7 @@ class OrderProvider with ChangeNotifier {
         item.id = id;
         loadedItems.add(item);
       });
-      _orders = loadedItems;
+      _orders = loadedItems.reversed.toList();
       notifyListeners();
     } catch (e) {
       print(e);
@@ -69,21 +87,25 @@ class OrderProvider with ChangeNotifier {
   }
 
   Future<bool> addOrder(List<CartItem> cartProducts, double total) async {
-    OrderItem item = OrderItem(
+    OrderItem order = OrderItem(
       id: "",
       amount: total,
       products: cartProducts,
       dateTime: DateTime.now(),
     );
 
-    final url = Uri.https(Constants.dbUrl, Constants.dbOrdersKey + ".json");
-    final response = await http.post(url, body: item.toJson());
+    final url = Uri.https(
+      DbConstants.dbUrl,
+      DbConstants.dbOrdersKey + "/$userID" + ".json",
+      {"auth": authToken},
+    );
+    final response = await http.post(url, body: order.toJson());
 
     if (response.statusCode == 200) {
-      item.id = json.decode(response.body)["name"];
+      order.id = json.decode(response.body)["name"];
       _orders.insert(
         0,
-        item,
+        order,
       );
       notifyListeners();
       return true;

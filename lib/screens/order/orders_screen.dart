@@ -18,7 +18,7 @@ class OrdersScreen extends StatelessWidget {
       ),
       drawer: AppDrawer(),
       body: FutureBuilder(
-        future: orderProvider.fetchAndSetProducts(),
+        future: orderProvider.fetchAndSetOrders(),
         builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting)
             return Center(child: CircularProgressIndicator());
@@ -29,7 +29,7 @@ class OrdersScreen extends StatelessWidget {
                   itemBuilder: (ctx, i) =>
                       OrderItemWidget(order: orderProvider.orders[i]));
             } else {
-              return const Center(child: Text("sads"));
+              return const Center(child: Text("An Error Occured."));
             }
           }
         },

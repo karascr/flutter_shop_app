@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_shop_app/providers/product.dart';
@@ -8,6 +9,11 @@ import '../core/constants.dart';
 import 'product.dart';
 
 class ProductsProvider with ChangeNotifier {
+  final String authToken;
+  final String userID;
+
+  ProductsProvider(this.authToken, this.userID, this._items);
+
   List<Product> _items = [
     // Product(
     //   id: 'p1',
@@ -51,14 +57,46 @@ class ProductsProvider with ChangeNotifier {
     return _items.where((i) => i.isFavorite).toList();
   }
 
-  Future<void> fetchAndSetProducts() async {
-    final url = Uri.https(Constants.dbUrl, Constants.dbProductsKey + ".json");
+  Future<void> fetchAndSetProducts({bool filterByUser = false}) async {
+    var filterMap = {
+      "orderBy": "\"creatorID\"",
+      "equalTo": "\"$userID\"",
+    };
+    final url = Uri.https(
+      DbConstants.dbUrl,
+      DbConstants.dbProductsKey + ".json",
+      {
+        "auth": authToken,
+      }..addEntries(
+          filterByUser
+              ? Iterable.generate(filterMap.length, (i) {
+                  return MapEntry(filterMap.keys.elementAt(i),
+                      filterMap.values.elementAt(i));
+                })
+              : {},
+        ),
+    );
+
+    final favoritesUrl = Uri.https(
+        DbConstants.dbUrl,
+        DbConstants.dbUserFavoritesKey + "/$userID" + ".json",
+        {"auth": authToken});
+
     try {
       final response = await http.get(url);
+      final favoritesResponse = await http.get(favoritesUrl);
+
+      if (response.statusCode != 200 || favoritesResponse.statusCode != 200)
+        throw HttpException(response.body + favoritesResponse.body);
+
       final data = json.decode(response.body) as Map<String, dynamic>;
+      final favoritesData =
+          json.decode(favoritesResponse.body) as Map<String, dynamic>;
       final List<Product> loadedProducts = [];
       data.forEach((id, data) {
         Product prod = Product.fromMap(data);
+        prod.isFavorite =
+            favoritesData[id] == null ? false : favoritesData[id] ?? false;
         prod.id = id;
         loadedProducts.add(prod);
       });
@@ -70,8 +108,17 @@ class ProductsProvider with ChangeNotifier {
   }
 
   Future<bool> addProduct(Product p) async {
-    final url = Uri.https(Constants.dbUrl, Constants.dbProductsKey + ".json");
-    final response = await http.post(url, body: p.toJson());
+    final url = Uri.https(
+      DbConstants.dbUrl,
+      DbConstants.dbProductsKey + ".json",
+      {"auth": authToken},
+    );
+    final response = await http.post(
+      url,
+      body: json.encode(
+        p.toMap()..putIfAbsent("creatorID", () => userID),
+      ),
+    );
 
     if (response.statusCode == 200) {
       print(json.decode(response.body));
@@ -88,7 +135,12 @@ class ProductsProvider with ChangeNotifier {
 
   Future<bool> updateProduct(Product p) async {
     final url = Uri.https(
-        Constants.dbUrl, Constants.dbProductsKey + "/${p.id}" + ".json");
+        DbConstants.dbUrl,
+        DbConstants.dbProductsKey +
+            "/${p.id}" +
+            ".json" +
+            "?auth=" +
+            authToken);
     final response = await http.patch(url, body: p.toJson());
 
     if (response.statusCode == 200) {
@@ -105,7 +157,10 @@ class ProductsProvider with ChangeNotifier {
 
   Future<bool> deleteProduct(String id) async {
     final url = Uri.https(
-        Constants.dbUrl, Constants.dbProductsKey + "/${id}" + ".json");
+      DbConstants.dbUrl,
+      DbConstants.dbProductsKey + "/${id}" + ".json",
+      {"auth": authToken},
+    );
     final result = await http.delete(url);
 
     if (result.statusCode == 200) {

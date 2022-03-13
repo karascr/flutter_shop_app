@@ -3,6 +3,7 @@ import 'package:flutter_shop_app/providers/auth_provider.dart';
 import 'package:flutter_shop_app/screens/cart/cart_screen.dart';
 import 'package:flutter_shop_app/screens/login/login_screen.dart';
 import 'package:flutter_shop_app/screens/order/orders_screen.dart';
+import 'package:flutter_shop_app/screens/splash_screen.dart';
 import 'package:flutter_shop_app/screens/user/edit_product_screen.dart';
 import 'package:flutter_shop_app/screens/user/user_products_screen.dart';
 import 'package:provider/provider.dart';
@@ -48,7 +49,19 @@ class MyApp extends StatelessWidget {
               colorScheme: ColorScheme.fromSwatch(
                   primarySwatch: Colors.purple, accentColor: Colors.deepOrange),
               fontFamily: "Lato"),
-          home: authProvider.isAuth ? ProductOverviewScreen() : LoginScreen(),
+          home: authProvider.isAuth
+              ? ProductOverviewScreen()
+              : FutureBuilder(
+                  future: authProvider.tryAutoSignin(),
+                  builder:
+                      (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                    return snapshot.connectionState == ConnectionState.waiting
+                        ? SplashScreen()
+                        : snapshot.data == true
+                            ? ProductOverviewScreen()
+                            : LoginScreen();
+                  },
+                ),
           routes: {
             LoginScreen.routeName: (context) => LoginScreen(),
             ProductOverviewScreen.routeName: (context) =>

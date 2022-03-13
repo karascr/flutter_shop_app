@@ -121,8 +121,8 @@ class ProductsProvider with ChangeNotifier {
     );
 
     if (response.statusCode == 200) {
-      print(json.decode(response.body));
-      print(json.decode(response.body)["name"]);
+      // print(json.decode(response.body));
+      // print(json.decode(response.body)["name"]);
       p.id = json.decode(response.body)["name"];
       _items.add(p);
       // _items.insert(0, newProduct);
